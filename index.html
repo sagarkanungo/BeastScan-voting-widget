@@ -1,59 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Upvote Widget</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-</head>
-<body>
-  <h1 class="controls-heading">Crafting a Dynamic Voting Widget: Engaging Users Through Interactive Ideas</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upvote Widget</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <h1 class="controls-heading">
+      Crafting a Dynamic Voting Widget: Engaging Users Through Interactive Ideas
+    </h1>
 
-  <div class="controls">
-    <button class="sort-btn" onclick="sortByVotes()">
-      <i class="fas fa-sort-amount-down-alt"></i> Sort by Votes
-    </button>
-    <button class="reset-btn" onclick="resetAll()">
-      <i class="fas fa-redo"></i> Reset All
-    </button>
-    <button class="idea-btn" onclick="openAddModal()">
-      <i class="fas fa-plus"></i> Add Idea
-    </button>
-  </div>
-
- <!-- Add Idea Modal -->
-<div id="add-modal" class="modal hidden">
-  <div class="modal-content">
-    <h2>Add New Idea</h2>
-    <input id="add-title" placeholder="Title" />
-    <textarea id="add-description" placeholder="Description"></textarea>
-    <input id="add-image" placeholder="Image URL" />
-    <input id="add-url" placeholder="Button URL" />
-    <input id="add-label" placeholder="Button Label" />
-    <button onclick="saveNewIdea()">Add</button>
-    <button onclick="closeAddModal()">Cancel</button>
-  </div>
-</div>
-<div id="loader" class="loader hidden">
-  <i class="fas fa-spinner fa-spin"></i> Loading ideas...
-</div>
-
-  <main id="card-container" class="card-container"></main>
-
-  <!-- Modal -->
-  <div id="modal" class="modal hidden">
-    <div class="modal-content">
-      <h2>Edit Card</h2>
-      <input id="edit-title" placeholder="Title" />
-      <textarea id="edit-description" placeholder="Description"></textarea>
-      <button id="save-btn">Save</button>
-      <button id="close-btn">Cancel</button>
+    <div class="controls">
+      <button class="sort-btn" onclick="sortByVotes()">
+        <i class="fas fa-sort-amount-down-alt"></i> Sort by Votes
+      </button>
+      <button class="reset-btn" onclick="resetAll()">
+        <i class="fas fa-redo"></i> Reset All
+      </button>
+      <button class="idea-btn" onclick="openAddModal()">
+        <i class="fas fa-plus"></i> Add Idea
+      </button>
     </div>
-  </div>
 
-  <script src="script.js"></script>
- 
-  
-</body>
+    <!-- Add Idea Modal -->
+    <div id="add-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Add New Idea</h2>
+        <input id="add-title" placeholder="Title" />
+        <textarea id="add-description" placeholder="Description"></textarea>
+        <input id="add-image" placeholder="Image URL" />
+        <input id="add-url" placeholder="Button URL" />
+        <input id="add-label" placeholder="Button Label" />
+        <button onclick="saveNewIdea()">Add</button>
+        <button onclick="closeAddModal()">Cancel</button>
+      </div>
+    </div>
+    <div id="loader" class="loader hidden">
+      <i class="fas fa-spinner fa-spin"></i> Loading ideas...
+    </div>
+
+    <main id="card-container" class="card-container"></main>
+
+    <!-- Modal -->
+    <div id="modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Edit Card</h2>
+        <input id="edit-title" placeholder="Title" />
+        <textarea id="edit-description" placeholder="Description"></textarea>
+        <input id="edit-image" placeholder="Image URL" />
+        <input id="edit-url" placeholder="Button URL" />
+        <input id="edit-label" placeholder="Button Label" />
+        <button id="save-btn">Save</button>
+        <button id="close-btn">Cancel</button>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
 </html>

@@ -3,7 +3,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
 }
 
 body {
@@ -36,7 +36,8 @@ body {
   font-weight: 600;
 }
 
-h2, h3 {
+h2,
+h3 {
   color: #333;
 }
 
@@ -60,7 +61,7 @@ button {
 }
 
 button {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   font-size: 18px;
 }
@@ -130,13 +131,13 @@ button:hover {
 }
 
 .card .delete-btn {
-  background-color: #F44336;
+  background-color: #f44336;
   padding: 8px 12px;
   font-size: 14px;
 }
 
 .card .delete-btn:hover {
-  background-color: #D32F2F;
+  background-color: #d32f2f;
 }
 
 .link {
@@ -181,14 +182,14 @@ button:hover {
 }
 
 .modal button {
-  background-color: #2196F3;
+  background-color: #2196f3;
   color: white;
   padding: 10px 20px;
   border-radius: 5px;
 }
 
 .modal button:hover {
-  background-color: #1976D2;
+  background-color: #1976d2;
 }
 
 .hidden {
@@ -197,7 +198,6 @@ button:hover {
 
 /* Media Queries */
 @media (max-width: 1024px) {
-  
   .card-container {
     padding: 20px;
   }

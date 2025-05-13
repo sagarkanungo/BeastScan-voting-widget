@@ -3,48 +3,47 @@ const container = document.getElementById("card-container");
 const modal = document.getElementById("modal");
 const editTitle = document.getElementById("edit-title");
 const editDesc = document.getElementById("edit-description");
+const editImage = document.getElementById("edit-image");
+const editUrl = document.getElementById("edit-url");
+const editLabel = document.getElementById("edit-label");
 const saveBtn = document.getElementById("save-btn");
 const closeBtn = document.getElementById("close-btn");
 const addModal = document.getElementById("add-modal");
 const loader = document.getElementById("loader");
-
 
 let cardsData = [];
 let editingIndex = null;
 
 // Load data
 async function loadCards() {
-  loader.classList.remove("hidden"); 
+  loader.classList.remove("hidden");
   await new Promise((resolve) => setTimeout(resolve, 3000));
-  
-  const cached = localStorage.getItem("cards");
-  if (cached) {
-    cardsData = JSON.parse(cached);
+
+  try {
+    const res = await fetch(API_URL);
+    cardsData = await res.json();
+  } catch (error) {
+    console.error("Failed to fetch data:", error);
+    cardsData = [];
+  } finally {
     loader.classList.add("hidden");
-  } else {
-    try {
-      const res = await fetch(API_URL);
-      cardsData = await res.json();
-      localStorage.setItem("cards", JSON.stringify(cardsData));
-    } catch (error) {
-      console.error("Failed to fetch data:", error);
-      cardsData = [];
-    }
-    finally {
-      loader.classList.add("hidden"); 
-    }
   }
+
   renderCards();
 }
 
 // Render
 function renderCards() {
+  if (!container) return;
   container.innerHTML = "";
+
   cardsData.forEach((card, index) => {
     const cardEl = document.createElement("div");
     cardEl.className = "card";
     cardEl.draggable = true;
     cardEl.dataset.index = index;
+    cardEl.id = `card-${index}`;
+    console.log("cardEl", cardEl.id);
 
     cardEl.addEventListener("dragstart", () => {
       cardEl.classList.add("dragging");
@@ -54,20 +53,30 @@ function renderCards() {
       cardEl.classList.remove("dragging");
     });
 
-    cardEl.innerHTML = `
-      <h3>${card.title}</h3>
-      <p>${card.description}</p>
-      <img src="${card.image}" alt="${card.title}" />
-      <p>👍 <span>${card.votes.up}</span> 👎 <span>${card.votes.down}</span></p>
-       <div class="button-container">
-      <button onclick="upvote(${index})">Upvote</button>
-      <button onclick="downvote(${index})">Downvote</button>
-      <button onclick="editCard(${index})">Edit</button>
-       <button class="delete-btn" onclick="deleteCard(${index})">Delete</button>
-      </div>
-       <a class="link" href="${card.button.url}" target="_blank">${card.button.label}</a>
+    // Handle null or undefined fields in the card object
+    const title = card.title || "No Title";
+    const description = card.description || "No Description";
+    const image =
+      card.image || "https://my.beastscan.com/images/beastscan-qr-code.png";
+    const upvotes = card.votes?.up || 0;
+    const downvotes = card.votes?.down || 0;
+    const buttonUrl = card.button?.url || "#";
+    const buttonLabel = card.button?.label || "Learn More";
 
+    cardEl.innerHTML = `
+      <h3>${title}</h3>
+      <p>${description}</p>
+      <img src="${image}" alt="${title}" />
+      <p>👍 <span>${upvotes}</span> 👎 <span>${downvotes}</span></p>
+      <div class="button-container">
+        <button onclick="upvote(${index})">Upvote</button>
+        <button onclick="downvote(${index})">Downvote</button>
+        <button onclick="editCard(${index})">Edit</button>
+        <button class="delete-btn" onclick="deleteCard(${index})">Delete</button>
+      </div>
+      <a class="link" href="${buttonUrl}" target="_blank">${buttonLabel}</a>
     `;
+
     container.appendChild(cardEl);
   });
 }
@@ -95,25 +104,30 @@ container.addEventListener("drop", () => {
 
 function getDragAfterElement(container, y) {
   const elements = [...container.querySelectorAll(".card:not(.dragging)")];
-  return elements.reduce((closest, child) => {
-    const box = child.getBoundingClientRect();
-    const offset = y - box.top - box.height / 2;
-    if (offset < 0 && offset > closest.offset) {
-      return { offset, element: child };
-    } else {
-      return closest;
-    }
-  }, { offset: Number.NEGATIVE_INFINITY }).element;
+  return elements.reduce(
+    (closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closest.offset) {
+        return { offset, element: child };
+      } else {
+        return closest;
+      }
+    },
+    { offset: Number.NEGATIVE_INFINITY }
+  ).element;
 }
 
 // Upvote / Downvote
 function upvote(index) {
-  cardsData[index].votes.up++;
-  saveAndRender();
+  if (cardsData[index].votes) {
+    cardsData[index].votes.up++;
+    saveAndRender();
+  }
 }
 
 function downvote(index) {
-  if (cardsData[index].votes.down > 0) {
+  if (cardsData[index].votes?.down > 0) {
     cardsData[index].votes.down--;
     saveAndRender();
   }
@@ -122,15 +136,25 @@ function downvote(index) {
 // Edit modal
 function editCard(index) {
   editingIndex = index;
-  editTitle.value = cardsData[index].title;
-  editDesc.value = cardsData[index].description;
+  const card = cardsData[index];
+
+  editTitle.value = card.title;
+  editDesc.value = card.description;
+  editImage.value = card.image || "";
+  editUrl.value = card.button.url || "";
+  editLabel.value = card.button.label || "";
+
   modal.classList.remove("hidden");
 }
 
 saveBtn.onclick = () => {
   if (editingIndex !== null) {
-    cardsData[editingIndex].title = editTitle.value;
-    cardsData[editingIndex].description = editDesc.value;
+    cardsData[editingIndex].title = editTitle.value.trim();
+    cardsData[editingIndex].description = editDesc.value.trim();
+    cardsData[editingIndex].image = editImage.value.trim();
+    cardsData[editingIndex].url = editUrl.value.trim();
+    cardsData[editingIndex].label = editLabel.value.trim();
+
     saveAndRender();
     modal.classList.add("hidden");
   }
@@ -142,7 +166,7 @@ closeBtn.onclick = () => {
 
 // Sort by votes
 function sortByVotes() {
-  cardsData.sort((a, b) => b.votes.up - a.votes.up);
+  cardsData.sort((a, b) => (b.votes?.up || 0) - (a.votes?.up || 0));
   saveAndRender();
 }
 
@@ -151,7 +175,6 @@ async function resetAll() {
   try {
     const res = await fetch(API_URL);
     cardsData = await res.json();
-    localStorage.setItem("cards", JSON.stringify(cardsData));
     renderCards();
   } catch (error) {
     console.error("Failed to reset data:", error);
@@ -168,11 +191,13 @@ function closeAddModal() {
 }
 
 function saveNewIdea() {
-  const title = document.getElementById("add-title").value;
-  const description = document.getElementById("add-description").value;
-  const image = document.getElementById("add-image").value;
-  const url = document.getElementById("add-url").value;
-  const label = document.getElementById("add-label").value;
+  const title = document.getElementById("add-title").value.trim();
+  const description = document.getElementById("add-description").value.trim();
+  const image =
+    document.getElementById("add-image").value.trim() ||
+    "https://my.beastscan.com/images/beastscan-qr-code.png";
+  const url = document.getElementById("add-url").value.trim();
+  const label = document.getElementById("add-label").value.trim();
 
   if (!title || !description) {
     alert("Title and description are required.");
@@ -195,25 +220,21 @@ function saveNewIdea() {
   closeAddModal();
 
   // Clear input fields
-  document.getElementById("add-title").value = '';
-  document.getElementById("add-description").value = '';
-  document.getElementById("add-image").value = '';
-  document.getElementById("add-url").value = '';
-  document.getElementById("add-label").value = '';
-  
-} 
-
-
+  document.getElementById("add-title").value = "";
+  document.getElementById("add-description").value = "";
+  document.getElementById("add-image").value = "";
+  document.getElementById("add-url").value = "";
+  document.getElementById("add-label").value = "";
+}
 
 function deleteCard(index) {
-    if (confirm("Are you sure you want to delete this idea?")) {
-      cardsData.splice(index, 1);
-      saveAndRender();
-    }
+  if (confirm("Are you sure you want to delete this idea?")) {
+    cardsData.splice(index, 1);
+    saveAndRender();
   }
+}
 
 function saveAndRender() {
-  localStorage.setItem("cards", JSON.stringify(cardsData));
   renderCards();
 }
 
