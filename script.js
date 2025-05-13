@@ -6,6 +6,7 @@ const editDesc = document.getElementById("edit-description");
 const saveBtn = document.getElementById("save-btn");
 const closeBtn = document.getElementById("close-btn");
 const addModal = document.getElementById("add-modal");
+const loader = document.getElementById("loader");
 
 
 let cardsData = [];
@@ -13,9 +14,13 @@ let editingIndex = null;
 
 // Load data
 async function loadCards() {
+  loader.classList.remove("hidden"); 
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+  
   const cached = localStorage.getItem("cards");
   if (cached) {
     cardsData = JSON.parse(cached);
+    loader.classList.add("hidden");
   } else {
     try {
       const res = await fetch(API_URL);
@@ -24,6 +29,9 @@ async function loadCards() {
     } catch (error) {
       console.error("Failed to fetch data:", error);
       cardsData = [];
+    }
+    finally {
+      loader.classList.add("hidden"); 
     }
   }
   renderCards();
